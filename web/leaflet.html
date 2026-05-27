@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <link rel="shortcut icon" href="#" />
+
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+            integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+            crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+             crossorigin=""></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/2.1.0/gpx.min.js"></script>
+
+        <script src="https://cdn.plot.ly/plotly-3.1.0.min.js" charset="utf-8"></script>
+
+
+        <style type="text/css">
+            #map { 
+                height: 500px; 
+            }
+        </style>
+
+        <title>My Leaflet-GPX</title>
+    </head>
+    
+    <body>
+         <div id="map"></div>
+         <div id="gpx_selector">
+            <label for="gpx_selection">Choose GPX:</label>
+            <!-- <select name="gpx_selection" id="gpx_selection" onchange='alert("gogo")'> -->
+            <select name="gpx_selection" id="gpx_selection">
+                <!-- <option value="{{ .GpxFilepath }}">{{ .GpxFilepath }}</option> -->
+                {{ range .GpxFilepath }}
+                <option value="{{ . }}">{{ basename . }}</option>
+                {{ end }}
+              <option value="/tmp/gpx/my.gpx">my.gpx (hardcoded)</option>
+            </select>
+         </div>
+         <div id="plot"></div>
+         <div id="info">
+             <h2>Map info</h2>
+             <p>Map bounds (s,w,n,e): <span id="map-bounds"></span></p>
+             <p>Map center: <span id="map-center"></span></p>
+             <p>Map zoom: <span id="map-zoom"></span></p>
+
+             <h2>Gpx info</h2>
+             <p>Distance: <span id="gpx-distance"></span> km</p>
+             <p>Ascent: <span id="gpx-ascent"></span> m</p>
+             <p>Descent: <span id="gpx-descent"></span> m</p>
+             
+         </div>
+        
+    </body>
+    
+    <script type="text/javascript" src="map.js"></script>
+    <!-- <script type="text/javascript" src="gpx_selector.js"></script> -->
+    <p><script type="text/javascript">
+        document.write("coucou")
+    </script></p>
+</html>
