@@ -1,5 +1,5 @@
 var map = L.map('map');
-// map.on('click', onMapClick);
+map.on('click', onMapClick);
 map.on('move', onMapMove);
 map.on('zoom', onMapZoom);
 map.on('load', onMapLoad);
@@ -189,7 +189,8 @@ function onMapLoad(e) {
 }
 
 function onMapClick(e) {
-    console.log("You clicked the map at " + e.latlng);
+    // console.log("You clicked the map at " + e.latlng);
+    document.getElementById("click-position").innerHTML = e.latlng;
 }
 
 function onMapMove(e) {
