@@ -23,7 +23,8 @@ const options = {
     // polyline_options: { color: 'red' },
     markers: {
 
-        startIcon: "imgs/placeholder.png", // impossble d'utiliser L.icon
+        // startIcon: "imgs/placeholder.png", // impossble d'utiliser L.icon
+        startIcon: "imgs/start.jpg", // TODO: testing
         // endIcon: "",
 
         wptTypeIcons: {

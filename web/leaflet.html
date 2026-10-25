@@ -12,45 +12,36 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/2.1.0/gpx.min.js"></script>
         <script src="https://cdn.plot.ly/plotly-3.1.0.min.js" charset="utf-8"></script>
 
-
-        <style type="text/css">
-            #map { 
-                height: 500px; 
-            }
-        </style>
-        <!-- <link rel="stylesheet" type="text/css" href="style.css" /> -->
-
+        <link rel="stylesheet" type="text/css" href="style.css" />
         <title>My Leaflet-GPX</title>
     </head>
-    
+
     <body>
-         <div id="map"></div>
-         <div id="gpx_selector">
+        <div id="map"></div>
+        <div id="gpx_selector">
             <label for="gpx_selection">Choose GPX:</label>
-            <!-- <select name="gpx_selection" id="gpx_selection" onchange='alert("gogo")'> -->
             <select name="gpx_selection" id="gpx_selection">
                 {{ range .GPXFilepath }}
                 <option value="{{ . }}">{{ basename . }}</option>
                 {{ end }}
                 <option value="/tmp/gpx/my.gpx">my.gpx (hardcoded)</option>
             </select>
-         </div>
-         <div id="plot"></div>
-         <div id="info">
-             <h2>Map info</h2>
-             <p>Map bounds (s,w,n,e): <span id="map-bounds"></span></p>
-             <p>Map center: <span id="map-center"></span></p>
-             <p>Map zoom: <span id="map-zoom"></span></p>
-             <p>Click position<span id="click-position"></span></p>
+        </div>
+        <div id="plot"></div>
 
-             <h2>Gpx info</h2>
-             <p>Distance: <span id="gpx-distance"></span> km</p>
-             <p>Ascent: <span id="gpx-ascent"></span> m</p>
-             <p>Descent: <span id="gpx-descent"></span> m</p>
-             
-         </div>
-        
+        <div id="info">
+            <h2>Map info</h2>
+            <p>Map bounds (s,w,n,e): <span id="map-bounds"></span></p>
+            <p>Map center: <span id="map-center"></span></p>
+            <p>Map zoom: <span id="map-zoom"></span></p>
+            <p>Click position<span id="click-position"></span></p>
+            <h2>Gpx info</h2>
+            <p>Distance: <span id="gpx-distance"></span> km</p>
+            <p>Ascent: <span id="gpx-ascent"></span> m</p>
+            <p>Descent: <span id="gpx-descent"></span> m</p>
+        </div>
+                
     </body>
-    
+            
     <script type="text/javascript" src="map.js"></script>
 </html>

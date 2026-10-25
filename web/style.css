@@ -1,0 +1,22 @@
+#map { 
+    width: 100vw;
+    height: 70vh;
+}
+
+#plot {
+    border: medium solid blue;
+}
+
+
+table, th, td  {
+    border: 2px solid lightgrey;
+    border-collapse: collapse;
+}
+thead th {
+    border: 2px double black;
+    font-weight: bold;
+}
+tfoot td {
+    border: 2px double black;
+    font-weight: bold;
+}

@@ -3,8 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"html/template"
-	"io"
 	"net/http"
 	"path/filepath"
 
@@ -20,58 +18,39 @@ var leafletHTML string
 //go:embed web/map.js
 var mapJs string
 
-func serveMapJs(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, mapJs)
-	// http.ServeFile(w, r, "web/map.js")
-}
+//go:embed web/style.css
+var styleCSS string
 
-func servePattern(pattern string) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// fmt.Println("request:", r.Pattern) // not working
-		http.ServeFile(w, r, pattern+r.PathValue("GPXFilePath"))
-	}
-}
+//go:embed imgs/a.jpg
+var startIcon string
 
-func writeTemplateWithGPXFiles(w io.Writer, tmpl string, paths []string) {
-	funcs := template.FuncMap{}
-	funcs["basename"] = filepath.Base
-
-	t, err := template.New("").
-		Funcs(funcs).
-		Parse(tmpl)
-	check(err)
-
-	err = t.Execute(w, struct {
-		GPXFilepath []string
-	}{
-		GPXFilepath: paths})
-	check(err)
-}
-
-func serveMainWithGPXFiles(HTMLmain string, GPXFilepaths []string) func(w http.ResponseWriter, r *http.Request) {
-	// format GPX filepaths
-	GPXFilesToServe := prefixSlice(GPXFilepaths, ROUTE_PREFIX)
-	for i := range GPXFilepaths {
-		GPXFilesToServe[i] = filepath.Clean(GPXFilesToServe[i])
+func init() {
+	// Init flag
+	flag.Usage = func() {
+		fmt.Println(`leaflet-serve runs a server to expose a leaflet map with local GPX file
+Usage:
+	leaflet-serve path/to/a.gpx [other.gpx...]
+`)
 	}
 
-	// Create template and write response with it
-	return func(w http.ResponseWriter, r *http.Request) {
-		writeTemplateWithGPXFiles(w, HTMLmain, GPXFilesToServe)
-	}
+	// Parse flag
+	flag.Parse()
 }
 
 func main() {
-	// Parse positional args for GPX Files to serve
-	flag.Parse()
+	// Get positional args for GPX Files to serve
 	args := flag.Args()
+
 	if len(args) == 0 {
-		fmt.Println("You must provide at least one gpx filepath to expose")
+		flag.Usage()
+		fmt.Println("You must provide at least one gpx filepath to expose.")
 		return
 	}
 
 	// Set up utils
-	http.HandleFunc("/map.js", serveMapJs)
+	http.HandleFunc("/map.js", serveStatic(mapJs, http.Header{"Content-Type": []string{"text/javascript"}}))
+	http.HandleFunc("/style.css", serveStatic(styleCSS, http.Header{"Content-Type": []string{"text/css"}}))
+	// http.HandleFunc("/imgs/start.jpg", serveStatic(startIcon, http.Header{"Content-Type": []string{"image/jpeg"}}))
 
 	// Set up main page
 	http.HandleFunc("/", serveMainWithGPXFiles(leafletHTML, args))
@@ -79,7 +58,7 @@ func main() {
 	// Set up route to expose .gpx files
 	for _, dir := range uniqueDirs(args) {
 		route := filepath.Clean(ROUTE_PREFIX + dir + "{GPXFilePath}")
-		http.HandleFunc(route, servePattern(dir))
+		http.HandleFunc(route, serveGPXFile(dir))
 	}
 
 	fmt.Println("Run web server on localhost:8000")
