@@ -1,10 +1,11 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"html/template"
+	"io"
 	"net/http"
-	"os"
 	"path/filepath"
 
 	_ "embed"
@@ -14,7 +15,7 @@ import (
 const ROUTE_PREFIX = "/tmp/"
 
 //go:embed web/leaflet.html
-var leafletHtml string
+var leafletHTML string
 
 //go:embed web/map.js
 var mapJs string
@@ -24,56 +25,61 @@ func serveMapJs(w http.ResponseWriter, r *http.Request) {
 	// http.ServeFile(w, r, "web/map.js")
 }
 
-func serveDir(dir string) func(http.ResponseWriter, *http.Request) {
-	fmt.Println("serveDir: dir:", dir)
+func servePattern(pattern string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println(`serveDir: r.PathValue("gpxFilepath"):`, r.PathValue("gpxFilepath"))
-		localFile := dir + r.PathValue("gpxFilepath")
-		fmt.Println("Serve local file: ", localFile)
-		http.ServeFile(w, r, localFile)
+		// fmt.Println("request:", r.Pattern) // not working
+		http.ServeFile(w, r, pattern+r.PathValue("GPXFilePath"))
 	}
 }
 
-func serveMainPage(localFilePaths []string) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		funcs := template.FuncMap{}
-		funcs["basename"] = filepath.Base
-		t, err := template.New("").
-			Funcs(funcs).
-			Parse(leafletHtml)
-		check(err)
+func writeTemplateWithGPXFiles(w io.Writer, tmpl string, paths []string) {
+	funcs := template.FuncMap{}
+	funcs["basename"] = filepath.Base
 
-		err = t.Execute(w, struct {
-			GpxFilepath []string
-		}{
-			GpxFilepath: prefixSlice(localFilePaths, ROUTE_PREFIX)})
-		check(err)
+	t, err := template.New("").
+		Funcs(funcs).
+		Parse(tmpl)
+	check(err)
+
+	err = t.Execute(w, struct {
+		GPXFilepath []string
+	}{
+		GPXFilepath: paths})
+	check(err)
+}
+
+func serveMainWithGPXFiles(HTMLmain string, GPXFilepaths []string) func(w http.ResponseWriter, r *http.Request) {
+	// format GPX filepaths
+	GPXFilesToServe := prefixSlice(GPXFilepaths, ROUTE_PREFIX)
+	for i := range GPXFilepaths {
+		GPXFilesToServe[i] = filepath.Clean(GPXFilesToServe[i])
+	}
+
+	// Create template and write response with it
+	return func(w http.ResponseWriter, r *http.Request) {
+		writeTemplateWithGPXFiles(w, HTMLmain, GPXFilesToServe)
 	}
 }
 
 func main() {
-	// Set up main page, template filled
-	http.HandleFunc("/", serveMainPage(os.Args[1:]))
+	// Parse positional args for GPX Files to serve
+	flag.Parse()
+	args := flag.Args()
+	if len(args) == 0 {
+		fmt.Println("You must provide at least one gpx filepath to expose")
+		return
+	}
 
-	// Set up map.js
+	// Set up utils
 	http.HandleFunc("/map.js", serveMapJs)
 
+	// Set up main page
+	http.HandleFunc("/", serveMainWithGPXFiles(leafletHTML, args))
+
 	// Set up route to expose .gpx files
-	dirs := dirsToExpose(os.Args[1:])
-	for _, dir := range dirs {
-
-		// TODO: fix: ./ -> "" not working
-		// it redirs to /tmp/tmp/tmp...
-		routeSuffix := filepath.Clean(dir + "{gpxFilepath}")
-		dirToServe, _ := filepath.Split(routeSuffix)
-		// dirToServe := dir
-		// routeSuffix := dir + "{gpxFilepath}"
-		route := ROUTE_PREFIX + routeSuffix
-		fmt.Println("Create route to: ", route)
-
-		fmt.Println("main: dir:", dir)
-		fmt.Println("main: dirToServe:", dirToServe)
-		http.HandleFunc(route, serveDir(dirToServe))
+	for _, dir := range uniqueDirs(args) {
+		route := filepath.Clean(ROUTE_PREFIX + dir + "{GPXFilePath}")
+		http.HandleFunc(route, servePattern(dir))
 	}
 
 	fmt.Println("Run web server on localhost:8000")

@@ -13,10 +13,13 @@ func check(err error) {
 }
 
 /*
-dirsToExpose is a helper function returning a unique slice of directories to expose
-It is used to parse user input
+uniqueDirs returns unique slice of directories to expose
+example:
+
+	input : /tmp/A.gpx /tmp/B.gpx /tmp/dir/C.gpx
+	output : /tmp/ /tmp/dir/ (prevent dupplicates /tmp/ dir)
 */
-func dirsToExpose(paths []string) []string {
+func uniqueDirs(paths []string) []string {
 	var dirs []string
 	for _, p := range paths {
 		d := filepath.Dir(p) + "/"
@@ -27,9 +30,10 @@ func dirsToExpose(paths []string) []string {
 	return dirs
 }
 
-func prefixSlice(sl []string, prefix string) []string {
-	for i := range sl {
-		sl[i] = prefix + sl[i]
+func prefixSlice(s []string, prefix string) []string {
+	ss := make([]string, len(s)) // copy to prevent modifying original content
+	for i := range ss {
+		ss[i] = prefix + s[i]
 	}
-	return sl
+	return ss
 }
