@@ -24,17 +24,17 @@ const options = {
     markers: {
 
         // startIcon: "imgs/placeholder.png", // impossble d'utiliser L.icon
-        startIcon: "imgs/start.jpg", // TODO: testing
-        // endIcon: "",
+        startIcon: "imgs/flag-start.png", 
+        endIcon: "imgs/flag-end.png",
 
         wptTypeIcons: {
-            "refuge": "imgs/person-shelter.svg",
-            "camping": "imgs/tent.svg",
-            "ville": "imgs/building.svg",
+            "refuge": "imgs/person-shelter.png", // TODO: testing. Not working yet
+            "campsite": "imgs/tent.svg",
+            "city": "imgs/building.svg",
             "river": "imgs/water.svg",
-            "col": "imgs/mountain-sun.svg",
-            "sommet": "imgs/mountain.svg",
-            "vue": "imgs/eye.svg",
+            "colpass": "imgs/mountain-sun.svg",
+            "peak": "imgs/mountain.svg",
+            "sight": "imgs/eye.svg",
         },
 
         // Marche pas
@@ -47,8 +47,8 @@ const options = {
 
     },
     marker_options: {
-        iconSize: [15, 15],
-        iconAnchor: [15, 15],
+        iconSize: [30, 30],
+        iconAnchor: [30, 30],
     },
     gpx_options: {
         parseElements: ["track", "waypoint"],

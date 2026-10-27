@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"flag"
 	"fmt"
 	"net/http"
@@ -10,7 +11,7 @@ import (
 )
 
 // ROUTE_PREFIX configures the route prefix to expose user files
-const ROUTE_PREFIX = "/tmp/"
+const ROUTE_PREFIX = "/gpx/"
 
 //go:embed web/leaflet.html
 var leafletHTML string
@@ -21,8 +22,8 @@ var mapJs string
 //go:embed web/style.css
 var styleCSS string
 
-//go:embed imgs/a.jpg
-var startIcon string
+//go:embed imgs/*
+var ficons embed.FS
 
 func init() {
 	// Init flag
@@ -48,9 +49,25 @@ func main() {
 	}
 
 	// Set up utils
-	http.HandleFunc("/map.js", serveStatic(mapJs, http.Header{"Content-Type": []string{"text/javascript"}}))
-	http.HandleFunc("/style.css", serveStatic(styleCSS, http.Header{"Content-Type": []string{"text/css"}}))
-	// http.HandleFunc("/imgs/start.jpg", serveStatic(startIcon, http.Header{"Content-Type": []string{"image/jpeg"}}))
+	http.HandleFunc("/map.js", serveString(mapJs, http.Header{"Content-Type": []string{"text/javascript"}}))
+	http.HandleFunc("/style.css", serveString(styleCSS, http.Header{"Content-Type": []string{"text/css"}}))
+
+	http.HandleFunc("/imgs/flag-start.png",
+		serveFile("imgs/flag-start.png", http.Header{"Content-Type": []string{"image/png"}}))
+	http.HandleFunc("/imgs/flag-end.png",
+		serveFile("imgs/flag-end.png", http.Header{"Content-Type": []string{"image/png"}}))
+
+	http.HandleFunc("/imgs/person-shelter.png",
+		serveFile("imgs/a.jpg", http.Header{"Content-Type": []string{"image/png"}}))
+
+	http.HandleFunc("/imgs/building.svg",
+		serveFile("imgs/building.svg", http.Header{"Content-Type": []string{"image/svg+xml"}}))
+	http.HandleFunc("/imgs/water.svg",
+		serveFile("imgs/water.svg", http.Header{"Content-Type": []string{"image/svg+xml"}}))
+	http.HandleFunc("/imgs/mountain-sun.svg",
+		serveFile("imgs/mountain-sun.svg", http.Header{"Content-Type": []string{"image/svg+xml"}}))
+	http.HandleFunc("/imgs/eye.svg",
+		serveFile("imgs/eye.svg", http.Header{"Content-Type": []string{"image/svg+xml"}}))
 
 	// Set up main page
 	http.HandleFunc("/", serveMainWithGPXFiles(leafletHTML, args))

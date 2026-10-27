@@ -9,9 +9,9 @@ import (
 )
 
 /*
-serveStatic serves static files as *.js script, *.css stylesheet, ...
+serveString serves static files as *.js script, *.css stylesheet, ...
 */
-func serveStatic(content string, header http.Header) func(http.ResponseWriter, *http.Request) {
+func serveString(content string, header http.Header) func(http.ResponseWriter, *http.Request) {
 	var h map[string][]string = header // convert header to fetch keys
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Set response header
@@ -21,6 +21,18 @@ func serveStatic(content string, header http.Header) func(http.ResponseWriter, *
 
 		// Write body
 		fmt.Fprintf(w, content)
+	}
+}
+func serveFile(path string, header http.Header) func(http.ResponseWriter, *http.Request) {
+	var h map[string][]string = header // convert header to fetch keys
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Set response header
+		for key := range h {
+			w.Header().Set(key, header.Get(key))
+		}
+
+		// Write body
+		http.ServeFile(w, r, path)
 	}
 }
 
