@@ -1,1 +1,3 @@
+- leaflet features
+    - add query object on osm
 - to integrate inside gpx-cli
