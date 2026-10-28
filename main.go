@@ -57,8 +57,8 @@ func main() {
 	http.HandleFunc("/imgs/flag-end.png",
 		serveFile("imgs/flag-end.png", http.Header{"Content-Type": []string{"image/png"}}))
 
-	http.HandleFunc("/imgs/person-shelter.png",
-		serveFile("imgs/a.jpg", http.Header{"Content-Type": []string{"image/png"}}))
+	http.HandleFunc("/imgs/person-shelter.svg",
+		serveFile("imgs/person-shelter.svg", http.Header{"Content-Type": []string{"image/svg+xml"}}))
 
 	http.HandleFunc("/imgs/building.svg",
 		serveFile("imgs/building.svg", http.Header{"Content-Type": []string{"image/svg+xml"}}))

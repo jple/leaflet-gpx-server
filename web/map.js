@@ -23,27 +23,31 @@ const options = {
     // polyline_options: { color: 'red' },
     markers: {
 
-        // startIcon: "imgs/placeholder.png", // impossble d'utiliser L.icon
         startIcon: "imgs/flag-start.png", 
         endIcon: "imgs/flag-end.png",
 
-        wptTypeIcons: {
-            "refuge": "imgs/person-shelter.png", // TODO: testing. Not working yet
-            "campsite": "imgs/tent.svg",
+        wptIcons: { // Match <sym> (within <wpt>)
+            "refuge": "imgs/person-shelter.svg",
             "city": "imgs/building.svg",
+        },
+
+        wptTypeIcons: { // Match <type> (within <wpt>)
+            "refuge": "imgs/person-shelter.svg",
+            "city": "imgs/building.svg",
+
+            "campsite": "imgs/tent.svg",
             "river": "imgs/water.svg",
             "colpass": "imgs/mountain-sun.svg",
             "peak": "imgs/mountain.svg",
             "sight": "imgs/eye.svg",
         },
 
-        // Marche pas
-        // pointMatchers: [
-        //     {
-        //         regex: /refuge/,
-        //         icon: "imgs/location-dot.svg",
-        //     },
-        // ],
+        pointMatchers: [ // regex on <name> (within <wpt>)
+            {
+                regex: /Rifugio/, 
+                icon: "imgs/person-shelter.png",
+            },
+        ],
 
     },
     marker_options: {
